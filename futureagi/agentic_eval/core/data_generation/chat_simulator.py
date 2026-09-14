@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 import time
 import uuid
 from typing import Any
@@ -83,8 +84,12 @@ def simulate_chat(
     """
     if max_turns < 1:
         raise ValueError("max_turns must be >= 1")
-    if timeout_s is not None and timeout_s <= 0:
-        raise ValueError("timeout_s must be positive or None")
+    if timeout_s is not None and (
+        not isinstance(timeout_s, (int, float))
+        or not math.isfinite(timeout_s)
+        or timeout_s <= 0
+    ):
+        raise ValueError("timeout_s must be a positive finite number or None")
 
     deadline = time.monotonic() + timeout_s if timeout_s is not None else None
 

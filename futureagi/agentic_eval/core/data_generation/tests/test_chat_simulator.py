@@ -90,6 +90,18 @@ def test_invalid_timeout_raises():
         simulate_chat(human, expert, "q?", max_turns=3, timeout_s=0, verbose=False)
 
 
+def test_nonfinite_timeout_raises():
+    human, expert, _, _ = _make_pair(["x"], ["x"])
+    with pytest.raises(ValueError):
+        simulate_chat(
+            human, expert, "q?", max_turns=3, timeout_s=float("nan"), verbose=False
+        )
+    with pytest.raises(ValueError):
+        simulate_chat(
+            human, expert, "q?", max_turns=3, timeout_s=float("inf"), verbose=False
+        )
+
+
 def test_timeout_budget_exhausted(monkeypatch):
     human, expert, _, _ = _make_pair(["keep going"] * 10, ["keep going"] * 10)
     import agentic_eval.core.data_generation.chat_simulator as mod
