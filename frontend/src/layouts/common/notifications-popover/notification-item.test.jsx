@@ -49,6 +49,16 @@ describe("sanitizeNotificationHtml", () => {
     expect(out).toContain('<a href="#">link</a>');
   });
 
+  it("keeps stray self-closing anchors inert instead of creating elements", () => {
+    // Legacy mock typo was `<a/>` as a closing token; browsers parse that
+    // as an <a> start tag, but the allow-list only restores </a>, so it
+    // renders as inert text rather than an unclosed anchor.
+    const out = sanitizeNotificationHtml("<p>x<a/></p>");
+    expect(out).toContain("<p>");
+    expect(out).toContain("&lt;a/&gt;");
+    expect(out).not.toMatch(executableTag);
+  });
+
   it("returns empty string for missing titles instead of throwing", () => {
     expect(sanitizeNotificationHtml(undefined)).toBe("");
     expect(sanitizeNotificationHtml(null)).toBe("");
